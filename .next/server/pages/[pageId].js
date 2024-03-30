@@ -1800,17 +1800,6 @@ module.exports = require("react-body-classname");
 
 /***/ }),
 
-/***/ "react-fast-compare":
-/*!*************************************!*\
-  !*** external "react-fast-compare" ***!
-  \*************************************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("react-fast-compare");
-
-/***/ }),
-
 /***/ "react-hotkeys-hook":
 /*!*************************************!*\
   !*** external "react-hotkeys-hook" ***!
