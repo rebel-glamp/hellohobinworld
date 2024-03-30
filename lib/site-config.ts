@@ -33,6 +33,9 @@ export interface SiteConfig {
 
   navigationStyle?: types.NavigationStyle
   navigationLinks?: Array<NavigationLink>
+
+  // Custom
+  enableComment: boolean;
 }
 
 export interface NavigationLink {

@@ -29,6 +29,11 @@ import { PageHead } from './PageHead'
 import styles from './styles.module.css'
 
 // -----------------------------------------------------------------------------
+// 커스터마이징
+// -----------------------------------------------------------------------------
+import Comments from './Comments';
+
+// -----------------------------------------------------------------------------
 // dynamic imports for optional components
 // -----------------------------------------------------------------------------
 
@@ -278,6 +283,13 @@ export const NotionPage: React.FC<types.PageProps> = ({
         mapImageUrl={mapImageUrl}
         searchNotion={config.isSearchEnabled ? searchNotion : null}
         pageAside={pageAside}
+        pageFooter={
+          config.enableComment ? (
+            !isBlogPost ? null : (
+              <Comments pageId={pageId} recordMap={recordMap} />
+            )
+          ) : null
+        }
         footer={footer}
       />
 

@@ -28,6 +28,9 @@ import {
   posthogId
 } from '@/lib/config'
 
+// Custom
+import 'styles/custom/index.scss';
+
 if (!isServer) {
   bootstrap()
 }
