@@ -221,4 +221,5 @@ function invertPageUrlOverrides(
 }
 
 // Custom
+export const dateformat: string = getSiteConfig('dateformat', 'yyyy.MM.dd');
 export const enableComment: boolean = getSiteConfig('enableComment', false);

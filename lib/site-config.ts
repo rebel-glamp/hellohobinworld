@@ -35,6 +35,7 @@ export interface SiteConfig {
   navigationLinks?: Array<NavigationLink>
 
   // Custom
+  dateformat: string;
   enableComment: boolean;
 }
 
