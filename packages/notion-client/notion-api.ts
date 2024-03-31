@@ -1,5 +1,5 @@
 // import { promises as fs } from 'fs'
-import * as notion from 'notion-types'
+import * as notion from 'packages/notion-types'
 import got, { OptionsOfJSONResponseBody } from 'got'
 import {
   getBlockCollectionId,
@@ -507,17 +507,20 @@ export class NotionAPI {
     })
   }
 
-  public async getUsers(
-    userIds: string[],
-    gotOptions?: OptionsOfJSONResponseBody
-  ) {
-    return this.fetch<notion.RecordValues<notion.User>>({
+  public async getUsers(userIds: string[], gotOptions?: OptionsOfJSONResponseBody) {
+    // CUSTOM: 타입 수정
+    return this.fetch<
+      notion.RecordValues<{
+        role: notion.Role;
+        value: notion.User;
+      }>
+    >({
       endpoint: 'getRecordValues',
       body: {
-        requests: userIds.map((id) => ({ id, table: 'notion_user' }))
+        requests: userIds.map(id => ({ id, table: 'notion_user' })),
       },
-      gotOptions
-    })
+      gotOptions,
+    });
   }
 
   public async getBlocks(
