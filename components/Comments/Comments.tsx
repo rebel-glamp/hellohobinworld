@@ -17,8 +17,11 @@ interface CommentsProps {
 
 const Comments = ({ pageId, recordMap }: CommentsProps) => {
   const [loading, setLoading] = useState(false);
-  const { data, mutate } = useSWR(`/api/comments/${pageId}`);
 
+  const apiUrl = `/api/comments/${pageId}`;
+  const fetcher = (apiUrl) => fetch(apiUrl).then((r) => r.json());
+  const { data, mutate } = useSWR(apiUrl, fetcher);
+  
   const formik = useFormik({
     initialValues: {
       content: '',
@@ -41,7 +44,7 @@ const Comments = ({ pageId, recordMap }: CommentsProps) => {
     },
   });
 
-  const comments = (data?.results || []).map(item => {
+  const comments = (data?.results || []).map(item => {    
     const user = recordMap.notion_user[item.created_by.id]?.value || {
       id: 'guest',
       name: '익명',
