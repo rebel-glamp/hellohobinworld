@@ -1,36 +1,41 @@
 // import { promises as fs } from 'fs'
-import got, { OptionsOfJSONResponseBody } from 'got';
-import * as notion from 'notion-types';
-import { parsePageId, getPageContentBlockIds, uuidToId, getBlockCollectionId } from 'notion-utils';
-import pMap from 'p-map';
+import * as notion from 'notion-types'
+import got, { OptionsOfJSONResponseBody } from 'got'
+import {
+  getBlockCollectionId,
+  getPageContentBlockIds,
+  parsePageId,
+  uuidToId
+} from 'notion-utils'
+import pMap from 'p-map'
 
-import * as types from './types';
+import * as types from './types'
 
 /**
  * Main Notion API client.
  */
 export class NotionAPI {
-  private readonly _apiBaseUrl: string;
-  private readonly _authToken?: string;
-  private readonly _activeUser?: string;
-  private readonly _userTimeZone: string;
+  private readonly _apiBaseUrl: string
+  private readonly _authToken?: string
+  private readonly _activeUser?: string
+  private readonly _userTimeZone: string
 
   constructor({
     apiBaseUrl = 'https://www.notion.so/api/v3',
     authToken,
     activeUser,
-    userTimeZone = 'America/New_York',
+    userTimeZone = 'America/New_York'
   }: {
-    apiBaseUrl?: string;
-    authToken?: string;
-    userLocale?: string;
-    userTimeZone?: string;
-    activeUser?: string;
+    apiBaseUrl?: string
+    authToken?: string
+    userLocale?: string
+    userTimeZone?: string
+    activeUser?: string
   } = {}) {
-    this._apiBaseUrl = apiBaseUrl;
-    this._authToken = authToken;
-    this._activeUser = activeUser;
-    this._userTimeZone = userTimeZone;
+    this._apiBaseUrl = apiBaseUrl
+    this._authToken = authToken
+    this._activeUser = activeUser
+    this._userTimeZone = userTimeZone
   }
 
   public async getPage(
@@ -42,32 +47,28 @@ export class NotionAPI {
       signFileUrls = true,
       chunkLimit = 100,
       chunkNumber = 0,
-      gotOptions,
-      draftView = false,
+      gotOptions
     }: {
-      concurrency?: number;
-      fetchMissingBlocks?: boolean;
-      fetchCollections?: boolean;
-      signFileUrls?: boolean;
-      chunkLimit?: number;
-      chunkNumber?: number;
-      gotOptions?: OptionsOfJSONResponseBody;
-      draftView?: boolean;
-    } = {},
+      concurrency?: number
+      fetchMissingBlocks?: boolean
+      fetchCollections?: boolean
+      signFileUrls?: boolean
+      chunkLimit?: number
+      chunkNumber?: number
+      gotOptions?: OptionsOfJSONResponseBody
+    } = {}
   ): Promise<notion.ExtendedRecordMap> {
     const page = await this.getPageRaw(pageId, {
       chunkLimit,
       chunkNumber,
-      gotOptions,
-    });
-
-    const recordMap = page?.recordMap as notion.ExtendedRecordMap;
+      gotOptions
+    })
+    const recordMap = page?.recordMap as notion.ExtendedRecordMap
 
     if (!recordMap?.block) {
-      throw new Error(`Notion page not found "${uuidToId(pageId)}"`);
+      throw new Error(`Notion page not found "${uuidToId(pageId)}"`)
     }
 
-    // CUSTOM: 작성자 유저 정보 가져오도록 처리
     const pageBlockId = Object.keys(recordMap.block)[0];
     const pageBlock = recordMap.block[pageBlockId].value;
     const authorId = pageBlock.created_by_id;
@@ -79,36 +80,37 @@ export class NotionAPI {
     };
 
     // ensure that all top-level maps exist
-    recordMap.collection = recordMap.collection ?? {};
-    recordMap.collection_view = recordMap.collection_view ?? {};
-    recordMap.notion_user = recordMap.notion_user ?? {};
+    recordMap.collection = recordMap.collection ?? {}
+    recordMap.collection_view = recordMap.collection_view ?? {}
+    recordMap.notion_user = recordMap.notion_user ?? {}
 
     // additional mappings added for convenience
     // note: these are not native notion objects
-    recordMap.collection_query = {};
-    recordMap.signed_urls = {};
+    recordMap.collection_query = {}
+    recordMap.signed_urls = {}
 
     if (fetchMissingBlocks) {
       // eslint-disable-next-line no-constant-condition
       while (true) {
         // fetch any missing content blocks
         const pendingBlockIds = getPageContentBlockIds(recordMap).filter(
-          id => !recordMap.block[id],
-        );
+          (id) => !recordMap.block[id]
+        )
 
         if (!pendingBlockIds.length) {
-          break;
+          break
         }
 
-        const newBlocks = await this.getBlocks(pendingBlockIds, gotOptions).then(
-          res => res.recordMap.block,
-        );
+        const newBlocks = await this.getBlocks(
+          pendingBlockIds,
+          gotOptions
+        ).then((res) => res.recordMap.block)
 
-        recordMap.block = { ...recordMap.block, ...newBlocks };
+        recordMap.block = { ...recordMap.block, ...newBlocks }
       }
     }
 
-    const contentBlockIds = getPageContentBlockIds(recordMap);
+    const contentBlockIds = getPageContentBlockIds(recordMap)
 
     // Optionally fetch all data for embedded collections and their associated views.
     // NOTE: We're eagerly fetching *all* data for each collection and all of its views.
@@ -117,31 +119,33 @@ export class NotionAPI {
     // and edge caching.
     if (fetchCollections) {
       const allCollectionInstances: Array<{
-        collectionId: string;
-        collectionViewId: string;
-      }> = contentBlockIds.flatMap(blockId => {
-        const block = recordMap.block[blockId].value;
+        collectionId: string
+        collectionViewId: string
+      }> = contentBlockIds.flatMap((blockId) => {
+        const block = recordMap.block[blockId].value
         const collectionId =
           block &&
-          (block.type === 'collection_view' || block.type === 'collection_view_page') &&
-          getBlockCollectionId(block, recordMap);
+          (block.type === 'collection_view' ||
+            block.type === 'collection_view_page') &&
+          getBlockCollectionId(block, recordMap)
 
         if (collectionId) {
-          return block.view_ids?.map(collectionViewId => ({
+          return block.view_ids?.map((collectionViewId) => ({
             collectionId,
-            collectionViewId,
-          }));
+            collectionViewId
+          }))
         } else {
-          return [];
+          return []
         }
-      });
+      })
 
       // fetch data for all collection view instances
       await pMap(
         allCollectionInstances,
-        async collectionInstance => {
-          const { collectionId, collectionViewId } = collectionInstance;
-          const collectionView = recordMap.collection_view[collectionViewId]?.value;
+        async (collectionInstance) => {
+          const { collectionId, collectionViewId } = collectionInstance
+          const collectionView =
+            recordMap.collection_view[collectionViewId]?.value
 
           try {
             const collectionData = await this.getCollectionData(
@@ -149,10 +153,9 @@ export class NotionAPI {
               collectionViewId,
               collectionView,
               {
-                gotOptions,
-                draftView,
-              },
-            );
+                gotOptions
+              }
+            )
 
             // await fs.writeFile(
             //   `${collectionId}-${collectionViewId}.json`,
@@ -161,39 +164,39 @@ export class NotionAPI {
 
             recordMap.block = {
               ...recordMap.block,
-              ...collectionData.recordMap.block,
-            };
+              ...collectionData.recordMap.block
+            }
 
             recordMap.collection = {
               ...recordMap.collection,
-              ...collectionData.recordMap.collection,
-            };
+              ...collectionData.recordMap.collection
+            }
 
             recordMap.collection_view = {
               ...recordMap.collection_view,
-              ...collectionData.recordMap.collection_view,
-            };
+              ...collectionData.recordMap.collection_view
+            }
 
             recordMap.notion_user = {
               ...recordMap.notion_user,
-              ...collectionData.recordMap.notion_user,
-            };
+              ...collectionData.recordMap.notion_user
+            }
 
             recordMap.collection_query![collectionId] = {
               ...recordMap.collection_query![collectionId],
-              [collectionViewId]: (collectionData.result as any)?.reducerResults,
-            };
+              [collectionViewId]: (collectionData.result as any)?.reducerResults
+            }
           } catch (err) {
             // It's possible for public pages to link to private collections, in which case
             // Notion returns a 400 error
-            console.warn('NotionAPI collectionQuery error', pageId, err.message);
-            console.error(err);
+            console.warn('NotionAPI collectionQuery error', pageId, err.message)
+            console.error(err)
           }
         },
         {
-          concurrency,
-        },
-      );
+          concurrency
+        }
+      )
     }
 
     // Optionally fetch signed URLs for any embedded files.
@@ -201,29 +204,29 @@ export class NotionAPI {
     // because it is preferable for many use cases as opposed to making these API calls
     // lazily from the client-side.
     if (signFileUrls) {
-      await this.addSignedUrls({ recordMap, contentBlockIds, gotOptions });
+      await this.addSignedUrls({ recordMap, contentBlockIds, gotOptions })
     }
 
-    return recordMap;
+    return recordMap
   }
 
   public async addSignedUrls({
     recordMap,
     contentBlockIds,
-    gotOptions = {},
+    gotOptions = {}
   }: {
-    recordMap: notion.ExtendedRecordMap;
-    contentBlockIds?: string[];
-    gotOptions?: OptionsOfJSONResponseBody;
+    recordMap: notion.ExtendedRecordMap
+    contentBlockIds?: string[]
+    gotOptions?: OptionsOfJSONResponseBody
   }) {
-    recordMap.signed_urls = {};
+    recordMap.signed_urls = {}
 
     if (!contentBlockIds) {
-      contentBlockIds = getPageContentBlockIds(recordMap);
+      contentBlockIds = getPageContentBlockIds(recordMap)
     }
 
-    const allFileInstances = contentBlockIds.flatMap(blockId => {
-      const block = recordMap.block[blockId].value;
+    const allFileInstances = contentBlockIds.flatMap((blockId) => {
+      const block = recordMap.block[blockId]?.value
 
       if (
         block &&
@@ -235,44 +238,46 @@ export class NotionAPI {
           block.type === 'page')
       ) {
         const source =
-          block.type === 'page' ? block.format?.page_cover : block.properties?.source?.[0]?.[0];
+          block.type === 'page'
+            ? block.format?.page_cover
+            : block.properties?.source?.[0]?.[0]
+        // console.log(block, source)
 
         if (source) {
-          if (
-            source.indexOf('youtube') >= 0 ||
-            source.indexOf('vimeo') >= 0 ||
-            source.includes('splash')
-          ) {
-            return [];
+          if (!source.includes('secure.notion-static.com')) {
+            return []
           }
 
           return {
             permissionRecord: {
               table: 'block',
-              id: block.id,
+              id: block.id
             },
-            url: source,
-          };
+            url: source
+          }
         }
       }
 
-      return [];
-    });
+      return []
+    })
 
     if (allFileInstances.length > 0) {
       try {
-        const { signedUrls } = await this.getSignedFileUrls(allFileInstances, gotOptions);
+        const { signedUrls } = await this.getSignedFileUrls(
+          allFileInstances,
+          gotOptions
+        )
 
         if (signedUrls.length === allFileInstances.length) {
           for (let i = 0; i < allFileInstances.length; ++i) {
-            const file = allFileInstances[i];
-            const signedUrl = signedUrls[i];
+            const file = allFileInstances[i]
+            const signedUrl = signedUrls[i]
 
-            recordMap.signed_urls[file.permissionRecord.id] = signedUrl;
+            recordMap.signed_urls[file.permissionRecord.id] = signedUrl
           }
         }
       } catch (err) {
-        console.warn('NotionAPI getSignedfileUrls error', err);
+        console.warn('NotionAPI getSignedfileUrls error', err)
       }
     }
   }
@@ -282,17 +287,17 @@ export class NotionAPI {
     {
       gotOptions,
       chunkLimit = 100,
-      chunkNumber = 0,
+      chunkNumber = 0
     }: {
-      chunkLimit?: number;
-      chunkNumber?: number;
-      gotOptions?: OptionsOfJSONResponseBody;
-    } = {},
+      chunkLimit?: number
+      chunkNumber?: number
+      gotOptions?: OptionsOfJSONResponseBody
+    } = {}
   ) {
-    const parsedPageId = parsePageId(pageId);
+    const parsedPageId = parsePageId(pageId)
 
     if (!parsedPageId) {
-      throw new Error(`invalid notion pageId "${pageId}"`);
+      throw new Error(`invalid notion pageId "${pageId}"`)
     }
 
     const body = {
@@ -300,14 +305,14 @@ export class NotionAPI {
       limit: chunkLimit,
       chunkNumber: chunkNumber,
       cursor: { stack: [] },
-      verticalColumns: false,
-    };
+      verticalColumns: false
+    }
 
     return this.fetch<notion.PageChunk>({
       endpoint: 'loadPageChunk',
       body,
-      gotOptions,
-    });
+      gotOptions
+    })
   }
 
   public async getCollectionData(
@@ -319,23 +324,38 @@ export class NotionAPI {
       searchQuery = '',
       userTimeZone = this._userTimeZone,
       loadContentCover = true,
-      draftView = false,
-      gotOptions,
+      gotOptions
     }: {
-      type?: notion.CollectionViewType;
-      limit?: number;
-      searchQuery?: string;
-      userTimeZone?: string;
-      userLocale?: string;
-      loadContentCover?: boolean;
-      draftView?: boolean;
-      gotOptions?: OptionsOfJSONResponseBody;
-    } = {},
+      type?: notion.CollectionViewType
+      limit?: number
+      searchQuery?: string
+      userTimeZone?: string
+      userLocale?: string
+      loadContentCover?: boolean
+      gotOptions?: OptionsOfJSONResponseBody
+    } = {}
   ) {
-    const type = collectionView?.type;
-    const isBoardType = type === 'board';
-    const groupBy =
-      collectionView?.format?.board_columns_by || collectionView?.format?.collection_group_by;
+    const type = collectionView?.type
+    const isBoardType = type === 'board'
+    const groupBy = isBoardType
+      ? collectionView?.format?.board_columns_by
+      : collectionView?.format?.collection_group_by
+
+    let filters = []
+    if (collectionView?.format?.property_filters) {
+      filters = collectionView.format?.property_filters.map((filterObj) => {
+        //get the inner filter
+        return {
+          filter: filterObj?.filter?.filter,
+          property: filterObj?.filter?.property
+        }
+      })
+    }
+
+    //Fixes formula filters from not working
+    if (collectionView?.query2?.filter?.filters) {
+      filters.push(...collectionView.query2.filter.filters)
+    }
 
     let loader: any = {
       type: 'reducer',
@@ -343,29 +363,25 @@ export class NotionAPI {
         collection_group_results: {
           type: 'results',
           limit,
-          loadContentCover,
-        },
+          loadContentCover
+        }
       },
       sort: [],
       ...collectionView?.query2,
+      filter: {
+        filters: filters,
+        operator: 'and'
+      },
       searchQuery,
-      userTimeZone,
-    };
-
-    // CUSTOM: 필터 작동하도록 처리
-    if (collectionView?.format?.property_filters?.length) {
-      loader.filter = {
-        operator: 'and',
-        filters: collectionView.format.property_filters
-          .map(filter => filter.filter)
-          .filter(draftView ? filter => filter.filter.operator !== 'status_is' : () => true),
-      };
+      userTimeZone
     }
 
     if (groupBy) {
       const groups =
-        collectionView?.format?.board_columns || collectionView?.format?.collection_groups || [];
-      const iterators = [isBoardType ? 'board' : 'group_aggregation', 'results'];
+        collectionView?.format?.board_columns ||
+        collectionView?.format?.collection_groups ||
+        []
+      const iterators = [isBoardType ? 'board' : 'group_aggregation', 'results']
       const operators = {
         checkbox: 'checkbox_is',
         url: 'string_starts_with',
@@ -373,40 +389,41 @@ export class NotionAPI {
         select: 'enum_is',
         multi_select: 'enum_contains',
         created_time: 'date_is_within',
-        ['undefined']: 'is_empty',
-      };
+        ['undefined']: 'is_empty'
+      }
 
-      const reducersQuery = {};
+      const reducersQuery = {}
       for (const group of groups) {
         const {
           property,
-          value: { value, type },
-        } = group;
+          value: { value, type }
+        } = group
 
         for (const iterator of iterators) {
           const iteratorProps =
             iterator === 'results'
               ? {
                   type: iterator,
-                  limit,
+                  limit
                 }
               : {
                   type: 'aggregation',
                   aggregation: {
-                    aggregator: 'count',
-                  },
-                };
+                    aggregator: 'count'
+                  }
+                }
 
-          const isUncategorizedValue = typeof value === 'undefined';
-          const isDateValue = value?.range;
+          const isUncategorizedValue = typeof value === 'undefined'
+          const isDateValue = value?.range
           // TODO: review dates reducers
           const queryLabel = isUncategorizedValue
             ? 'uncategorized'
             : isDateValue
             ? value.range?.start_date || value.range?.end_date
-            : value?.value || value;
+            : value?.value || value
 
-          const queryValue = !isUncategorizedValue && (isDateValue || value?.value || value);
+          const queryValue =
+            !isUncategorizedValue && (isDateValue || value?.value || value)
 
           reducersQuery[`${iterator}:${type}:${queryLabel}`] = {
             ...iteratorProps,
@@ -416,22 +433,24 @@ export class NotionAPI {
                 {
                   property,
                   filter: {
-                    operator: !isUncategorizedValue ? operators[type] : 'is_empty',
+                    operator: !isUncategorizedValue
+                      ? operators[type]
+                      : 'is_empty',
                     ...(!isUncategorizedValue && {
                       value: {
                         type: 'exact',
-                        value: queryValue,
-                      },
-                    }),
-                  },
-                },
-              ],
-            },
-          };
+                        value: queryValue
+                      }
+                    })
+                  }
+                }
+              ]
+            }
+          }
         }
       }
 
-      const reducerLabel = isBoardType ? 'board_columns' : `${type}_groups`;
+      const reducerLabel = isBoardType ? 'board_columns' : `${type}_groups`
       loader = {
         type: 'reducer',
         reducers: {
@@ -439,89 +458,110 @@ export class NotionAPI {
             type: 'groups',
             groupBy,
             ...(collectionView?.query2?.filter && {
-              filter: collectionView?.query2?.filter,
+              filter: collectionView?.query2?.filter
             }),
-            groupSortPreference: groups.map(group => group?.value),
-            limit,
+            groupSortPreference: groups.map((group) => group?.value),
+            limit
           },
-          ...reducersQuery,
+          ...reducersQuery
         },
         ...collectionView?.query2,
         searchQuery,
         userTimeZone,
         //TODO: add filters here
-        // filter: {
-        //   filters: filters,
-        //   operator: 'and'
-        // }
-      };
+        filter: {
+          filters: filters,
+          operator: 'and'
+        }
+      }
     }
+
+    // if (isBoardType) {
+    //   console.log(
+    //     JSON.stringify(
+    //       {
+    //         collectionId,
+    //         collectionViewId,
+    //         loader,
+    //         groupBy: groupBy || 'NONE',
+    //         collectionViewQuery: collectionView.query2 || 'NONE'
+    //       },
+    //       null,
+    //       2
+    //     )
+    //   )
+    // }
 
     return this.fetch<notion.CollectionInstance>({
       endpoint: 'queryCollection',
       body: {
         collection: {
-          id: collectionId,
+          id: collectionId
         },
         collectionView: {
-          id: collectionViewId,
+          id: collectionViewId
         },
-        loader,
+        loader
       },
-      gotOptions,
-    });
+      gotOptions
+    })
   }
 
-  public async getUsers(userIds: string[], gotOptions?: OptionsOfJSONResponseBody) {
-    // CUSTOM: 타입 수정
-    return this.fetch<
-      notion.RecordValues<{
-        role: notion.Role;
-        value: notion.User;
-      }>
-    >({
+  public async getUsers(
+    userIds: string[],
+    gotOptions?: OptionsOfJSONResponseBody
+  ) {
+    return this.fetch<notion.RecordValues<notion.User>>({
       endpoint: 'getRecordValues',
       body: {
-        requests: userIds.map(id => ({ id, table: 'notion_user' })),
+        requests: userIds.map((id) => ({ id, table: 'notion_user' }))
       },
-      gotOptions,
-    });
+      gotOptions
+    })
   }
 
-  public async getBlocks(blockIds: string[], gotOptions?: OptionsOfJSONResponseBody) {
+  public async getBlocks(
+    blockIds: string[],
+    gotOptions?: OptionsOfJSONResponseBody
+  ) {
     return this.fetch<notion.PageChunk>({
       endpoint: 'syncRecordValues',
       body: {
-        requests: blockIds.map(blockId => ({
+        requests: blockIds.map((blockId) => ({
           // TODO: when to use table 'space' vs 'block'?
           table: 'block',
           id: blockId,
-          version: -1,
-        })),
+          version: -1
+        }))
       },
-      gotOptions,
-    });
+      gotOptions
+    })
   }
 
   public async getSignedFileUrls(
     urls: types.SignedUrlRequest[],
-    gotOptions?: OptionsOfJSONResponseBody,
+    gotOptions?: OptionsOfJSONResponseBody
   ) {
     return this.fetch<types.SignedUrlResponse>({
       endpoint: 'getSignedFileUrls',
       body: {
-        urls,
+        urls
       },
-      gotOptions,
-    });
+      gotOptions
+    })
   }
 
-  public async search(params: notion.SearchParams, gotOptions?: OptionsOfJSONResponseBody) {
+  public async search(
+    params: notion.SearchParams,
+    gotOptions?: OptionsOfJSONResponseBody
+  ) {
     const body = {
       type: 'BlocksInAncestor',
       source: 'quick_find_public',
       ancestorId: parsePageId(params.ancestorId),
-      sort: 'Relevance',
+      sort: {
+        field: 'relevance'
+      },
       limit: params.limit || 20,
       query: params.query,
       filters: {
@@ -534,54 +574,59 @@ export class NotionAPI {
         editedBy: [],
         lastEditedTime: {},
         createdTime: {},
-        ...params.filters,
-      },
-    };
+        ...params.filters
+      }
+    }
 
     return this.fetch<notion.SearchResults>({
       endpoint: 'search',
       body,
-      gotOptions,
-    });
+      gotOptions
+    })
   }
 
   public async fetch<T>({
     endpoint,
     body,
     gotOptions,
-    headers: clientHeaders,
+    headers: clientHeaders
   }: {
-    endpoint: string;
-    body: object;
-    gotOptions?: OptionsOfJSONResponseBody;
-    headers?: any;
+    endpoint: string
+    body: object
+    gotOptions?: OptionsOfJSONResponseBody
+    headers?: any
   }): Promise<T> {
     const headers: any = {
       ...clientHeaders,
       ...gotOptions?.headers,
-      'Content-Type': 'application/json',
-    };
+      'Content-Type': 'application/json'
+    }
 
     if (this._authToken) {
-      headers.cookie = `token_v2=${this._authToken}`;
+      headers.cookie = `token_v2=${this._authToken}`
     }
 
     if (this._activeUser) {
-      headers['x-notion-active-user-header'] = this._activeUser;
+      headers['x-notion-active-user-header'] = this._activeUser
     }
 
-    const url = `${this._apiBaseUrl}/${endpoint}`;
+    const url = `${this._apiBaseUrl}/${endpoint}`
 
     return got
       .post(url, {
         ...gotOptions,
-        retry: {
-          limit: 2,
-          methods: ['POST'],
-        },
         json: body,
-        headers,
+        headers
       })
-      .json();
+      .json()
+
+    // return fetch(url, {
+    //   method: 'post',
+    //   body: JSON.stringify(body),
+    //   headers
+    // }).then((res) => {
+    //   console.log(endpoint, res)
+    //   return res.json()
+    // })
   }
 }
