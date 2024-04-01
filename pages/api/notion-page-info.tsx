@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import got from 'got'
-import { PageBlock } from 'notion-types'
+import { PageBlock } from 'packages/notion-types'
 import {
   getBlockIcon,
   getBlockTitle,

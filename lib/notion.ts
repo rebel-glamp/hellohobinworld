@@ -1,4 +1,4 @@
-import { ExtendedRecordMap, SearchParams, SearchResults } from 'notion-types'
+import { ExtendedRecordMap, SearchParams, SearchResults } from 'packages/notion-types'
 import { mergeRecordMaps } from 'notion-utils'
 import pMap from 'p-map'
 import pMemoize from 'p-memoize'

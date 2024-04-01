@@ -43,7 +43,6 @@ export type BlockType =
   | 'external_object_instance'
   | 'breadcrumb'
   | 'miro'
-  | 'replit'
   // fallback for unknown blocks
   | string;
 
@@ -90,7 +89,6 @@ export type Block =
   | TableRowBlock
   | ExternalObjectInstance
   | BreadcrumbInstance
-  | replitBlock;
 
 /**
  * Base properties shared by all blocks.
@@ -464,8 +462,4 @@ export interface ExternalObjectInstance extends BaseBlock {
 
 export interface BreadcrumbInstance extends BaseBlock {
   type: 'breadcrumb';
-}
-
-export interface replitBlock extends BaseBlock {
-  type: 'replit';
 }

@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { PageBlock } from 'notion-types'
+import { PageBlock } from 'packages/notion-types'
 
 import { useNotionContext } from '../context'
 import { CollectionViewProps } from '../types'

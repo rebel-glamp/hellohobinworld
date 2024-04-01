@@ -1,12 +1,11 @@
 import * as React from 'react'
-
 import { CollectionViewType } from 'notion-types'
 
+import CollectionViewTableIcon from './collection-view-table'
 import CollectionViewBoardIcon from './collection-view-board'
-import CollectionViewCalendarIcon from './collection-view-calendar'
 import CollectionViewGalleryIcon from './collection-view-gallery'
 import CollectionViewListIcon from './collection-view-list'
-import CollectionViewTableIcon from './collection-view-table'
+import CollectionViewCalendarIcon from './collection-view-calendar'
 
 interface CollectionViewIconProps {
   className?: string

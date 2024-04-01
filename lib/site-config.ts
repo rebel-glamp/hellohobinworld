@@ -36,6 +36,7 @@ export interface SiteConfig {
 
   // Custom
   dateformat: string;
+  hiddenPostProperties: string[];
   enableComment: boolean;
 }
 

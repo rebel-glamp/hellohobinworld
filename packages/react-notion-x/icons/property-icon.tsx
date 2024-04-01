@@ -1,24 +1,22 @@
 import * as React from 'react'
-
 import { PropertyType } from 'notion-types'
 
-import CheckboxIcon from './type-checkbox'
-import DateIcon from './type-date'
-import EmailIcon from './type-email'
-import FileIcon from './type-file'
-import FormulaIcon from './type-formula'
-import MultiSelectIcon from './type-multi-select'
-import NumberIcon from './type-number'
-import PersonIcon from './type-person'
-import Person2Icon from './type-person-2'
-import PhoneNumberIcon from './type-phone-number'
-import RelationIcon from './type-relation'
-import SelectIcon from './type-select'
-import StatusIcon from './type-status'
-import TextIcon from './type-text'
-import TimestampIcon from './type-timestamp'
 import TitleIcon from './type-title'
+import TextIcon from './type-text'
+import NumberIcon from './type-number'
+import SelectIcon from './type-select'
+import MultiSelectIcon from './type-multi-select'
+import DateIcon from './type-date'
+import PersonIcon from './type-person'
+import FileIcon from './type-file'
+import CheckboxIcon from './type-checkbox'
 import UrlIcon from './type-url'
+import EmailIcon from './type-email'
+import PhoneNumberIcon from './type-phone-number'
+import FormulaIcon from './type-formula'
+import RelationIcon from './type-relation'
+import Person2Icon from './type-person-2'
+import TimestampIcon from './type-timestamp'
 
 interface PropertyIconProps {
   className?: string
@@ -30,7 +28,6 @@ const iconMap = {
   text: TextIcon,
   number: NumberIcon,
   select: SelectIcon,
-  status: StatusIcon,
   multi_select: MultiSelectIcon,
   date: DateIcon,
   person: PersonIcon,

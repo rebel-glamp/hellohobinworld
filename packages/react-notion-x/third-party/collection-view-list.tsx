@@ -1,12 +1,11 @@
 import * as React from 'react'
-
 import { PageBlock } from 'notion-types'
 
-import { useNotionContext } from '../context'
 import { CollectionViewProps } from '../types'
+import { Property } from './property'
+import { useNotionContext } from '../context'
 import { CollectionGroup } from './collection-group'
 import { getCollectionGroups } from './collection-utils'
-import { Property } from './property'
 
 const defaultBlockIds = []
 

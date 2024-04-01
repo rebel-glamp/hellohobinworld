@@ -1,4 +1,4 @@
-import { ExtendedRecordMap } from 'notion-types'
+import { ExtendedRecordMap } from 'packages/notion-types'
 import { parsePageId, uuidToId } from 'notion-utils'
 
 import { includeNotionIdInUrls } from './config'

@@ -1,6 +1,5 @@
 import * as React from 'react'
-
-import { Document, Page, pdfjs } from 'react-pdf'
+import { pdfjs, Page, Document } from 'react-pdf'
 
 // ensure pdfjs can find its worker script regardless of how react-notion-x is bundled
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`

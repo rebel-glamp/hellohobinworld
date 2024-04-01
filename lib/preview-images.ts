@@ -1,6 +1,6 @@
 import got from 'got'
 import lqip from 'lqip-modern'
-import { ExtendedRecordMap, PreviewImage, PreviewImageMap } from 'notion-types'
+import { ExtendedRecordMap, PreviewImage, PreviewImageMap } from 'packages/notion-types'
 import { getPageImageUrls, normalizeUrl } from 'notion-utils'
 import pMap from 'p-map'
 import pMemoize from 'p-memoize'

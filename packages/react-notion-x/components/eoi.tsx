@@ -1,11 +1,9 @@
 import * as React from 'react'
-
 import { Block } from 'notion-types'
 
 import { useNotionContext } from '../context'
-import SvgTypeGitHub from '../icons/type-github'
 import { cs, formatNotionDateTime } from '../utils'
-import { MentionPreviewCard } from './mention-preview-card'
+import SvgTypeGitHub from '../icons/type-github'
 
 // External Object Instance
 export const EOI: React.FC<{
@@ -65,13 +63,11 @@ export const EOI: React.FC<{
         <div className='notion-external-title'>{title}</div>
 
         {(owner || lastUpdated) && (
-          <MentionPreviewCard
-            title={title}
-            owner={owner}
-            lastUpdated={lastUpdated}
-            domain={domain}
-            externalImage={externalImage}
-          />
+          <div className='notion-external-subtitle'>
+            {owner && <span>{owner}</span>}
+            {owner && lastUpdated && <span> • </span>}
+            {lastUpdated && <span>Updated {lastUpdated}</span>}
+          </div>
         )}
       </div>
     </components.Link>

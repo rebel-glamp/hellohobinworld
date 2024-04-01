@@ -1,10 +1,10 @@
 import * as React from 'react'
 
 import { CollectionViewProps } from '../types'
-import { CollectionViewBoard } from './collection-view-board'
+import { CollectionViewTable } from './collection-view-table'
 import { CollectionViewGallery } from './collection-view-gallery'
 import { CollectionViewList } from './collection-view-list'
-import { CollectionViewTable } from './collection-view-table'
+import { CollectionViewBoard } from './collection-view-board'
 
 export const CollectionViewImpl: React.FC<CollectionViewProps> = (props) => {
   const { collectionView } = props
