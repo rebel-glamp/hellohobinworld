@@ -17,7 +17,7 @@ export const LazyImage: React.FC<{
   priority?: boolean;
 }> = ({ src, alt, className, style, zoomable = false, priority = false, height, ...rest }) => {
   const { recordMap, zoom, previewImages, forceCustomImages, components } = useNotionContext();
-
+  
   const zoomRef = React.useRef(zoom ? zoom.clone() : null);
   const previewImage = previewImages
     ? recordMap?.preview_images?.[src] ?? recordMap?.preview_images?.[normalizeUrl(src)]

@@ -10,7 +10,7 @@ export default siteConfig({
 
   // basic site info (required)
   name: 'Hello, Hobin World!',
-  domain: 'glamp-work.duckdns.org',
+  domain: 'chocolate-chartreuse-fd1.notion.site',
   author: 'hobin',
 
   // open graph metadata (optional)
