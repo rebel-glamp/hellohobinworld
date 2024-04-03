@@ -32,6 +32,7 @@ const _Breadcrumbs: React.FC<{
 
   const breadcrumbs = React.useMemo(() => {
     const breadcrumbs = getPageBreadcrumbs(recordMap, block.id);
+
     if (rootOnly) {
       return [breadcrumbs[0]].filter(Boolean);
     }

@@ -45,7 +45,9 @@ export const NotionPageHeader: React.FC<{
   return (
     <header className='notion-header'>
       <div className='notion-nav-header'>
-        <Breadcrumbs block={block} rootOnly={true} />
+        {/* 페이지 네비게이션 추가 유무 - rootOnly */}
+        {/* rootOnly true로하면 블로그 처음 페이지 링크만 나옴 */}
+        <Breadcrumbs block={block} rootOnly={false} />
 
         <div className='notion-nav-header-rhs breadcrumbs'>
           {navigationLinks
