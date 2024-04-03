@@ -146,8 +146,8 @@
   .notion-page-content-has-aside {
     display: flex;
     flex-direction: row;
-    /* width: calc((100vw + var(--notion-max-width)) / 2); */
-    width: 100%;
+    width: calc((100vw + var(--notion-max-width)) / 2);
+    /* width: 100%; */
   }
 
   .notion-page-content-has-aside .notion-aside {
