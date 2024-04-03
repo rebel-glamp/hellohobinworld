@@ -66,7 +66,7 @@ export default siteConfig({
   // -----------------------------------------------------------------------------
   // 커스터마이징
   // -----------------------------------------------------------------------------
-  dateformat: 'yyyy년 MM월 dd일',
+  dateformat: 'yyyy년 MM월 dd일 HH시 mm분',
   hiddenPostProperties: ['설명', '상태', '최하위 정렬'],
   enableComment: true,
 });

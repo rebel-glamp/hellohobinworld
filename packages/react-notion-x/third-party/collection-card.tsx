@@ -17,7 +17,7 @@ export const CollectionCard: React.FC<CollectionCardProps> = ({
   properties,
   className,
   ...rest
-}) => {
+}) => {  
   const ctx = useNotionContext()
   const { components, recordMap, mapPageUrl, mapImageUrl } = ctx
   let coverContent = null
@@ -111,6 +111,11 @@ export const CollectionCard: React.FC<CollectionCardProps> = ({
     }
   }
 
+  // console.log("--------------------------------------- Start");
+  // console.log(block);
+  // console.log("--------------------------------------- Middle");
+  // console.log(collection);
+  // console.log("--------------------------------------- End");
   return (
     <NotionContextProvider
       {...ctx}
@@ -144,7 +149,9 @@ export const CollectionCard: React.FC<CollectionCardProps> = ({
               collection={collection}
             />
           </div>
-
+          {/* {console.log("--------------------------------------- Pro Start")}
+          {console.log(properties)}
+          {console.log("--------------------------------------- Pro End")} */}
           {properties
             ?.filter(
               (p) =>
@@ -156,7 +163,11 @@ export const CollectionCard: React.FC<CollectionCardProps> = ({
               if (!block.properties) return null
               const schema = collection.schema[p.property]
               const data = block.properties[p.property]
-
+              // console.log("--------------------------------------- Pro Start");
+              // console.log(schema);
+              // console.log(data);
+              // console.log("--------------------------------------- Pro End");
+              
               return (
                 <div
                   className='notion-collection-card-property'

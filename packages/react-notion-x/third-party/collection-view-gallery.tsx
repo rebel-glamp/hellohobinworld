@@ -49,7 +49,7 @@ export const CollectionViewGallery: React.FC<CollectionViewProps> = ({
   )
 }
 
-function Gallery({ blockIds, collectionView, collection }) {
+function Gallery({ blockIds, collectionView, collection }) {  
   const { recordMap } = useNotionContext()
   const {
     gallery_cover = { type: 'none' },
@@ -69,7 +69,8 @@ function Gallery({ blockIds, collectionView, collection }) {
           {blockIds?.map((blockId) => {
             const block = recordMap.block[blockId]?.value as PageBlock
             if (!block) return null
-
+            console.log(collectionView.format);
+            
             return (
               <CollectionCard
                 collection={collection}

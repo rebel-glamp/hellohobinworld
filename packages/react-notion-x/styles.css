@@ -1600,7 +1600,7 @@ svg.notion-page-icon {
   position: relative;
   float: left;
   min-width: 100%;
-  padding-left: 0;
+  padding-left: 450px;
   transition: padding 200ms ease-out;
 }
 

@@ -133,10 +133,18 @@ const CollectionViewBlock: React.FC<{
           : maxNotionBodyWidth;
     }
 
-    const padding = isServer && !isMounted ? 96 : ((width - notionBodyWidth) / 2) | 0;
+    const padding = isServer && !isMounted ? 96 : ((width - notionBodyWidth) / 2) + 190 | 0;
     style.paddingLeft = padding;
     style.paddingRight = padding;
 
+    console.log("---------------------");
+    console.log(width);
+    console.log(notionBodyWidth);
+    console.log(isServer);
+    console.log(isMounted);
+    console.log(padding);
+    console.log("=====================");
+    
     return {
       style,
       width,
@@ -144,10 +152,10 @@ const CollectionViewBlock: React.FC<{
     };
   }, [windowWidth, parentPage, collectionView?.type, isMounted]);
 
-  // console.log({
-  //   width,
-  //   padding
-  // })
+  console.log({
+    width,
+    padding
+  })
 
   if (!(collection && collectionView && collectionData)) {
     console.warn('skipping missing collection view for block', block.id, {
