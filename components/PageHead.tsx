@@ -41,8 +41,9 @@ export const PageHead: React.FC<
       <meta name='robots' content='index,follow' />
       <meta property='og:type' content='website' />
 
-      {/* 네이버 SEO */}
+      {/* 네이버, 구글 SEO */}
       <meta name="naver-site-verification" content="29e2505ddcf70e4220775f9a248d69056d19d4ca" />
+      <meta name="google-site-verification" content="g2iPQwYwA5l4sWs79KX6gGsGnYlj20xMweFyRDC4SMs" />
 
       {site && (
         <>

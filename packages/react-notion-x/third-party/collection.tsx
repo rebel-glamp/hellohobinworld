@@ -137,13 +137,13 @@ const CollectionViewBlock: React.FC<{
     style.paddingLeft = padding;
     style.paddingRight = padding;
 
-    console.log("---------------------");
-    console.log(width);
-    console.log(notionBodyWidth);
-    console.log(isServer);
-    console.log(isMounted);
-    console.log(padding);
-    console.log("=====================");
+    // console.log("---------------------");
+    // console.log(width);
+    // console.log(notionBodyWidth);
+    // console.log(isServer);
+    // console.log(isMounted);
+    // console.log(padding);
+    // console.log("=====================");
     
     return {
       style,
@@ -152,10 +152,10 @@ const CollectionViewBlock: React.FC<{
     };
   }, [windowWidth, parentPage, collectionView?.type, isMounted]);
 
-  console.log({
-    width,
-    padding
-  })
+  // console.log({
+  //   width,
+  //   padding
+  // })
 
   if (!(collection && collectionView && collectionData)) {
     console.warn('skipping missing collection view for block', block.id, {
