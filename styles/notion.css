@@ -409,3 +409,12 @@
 .notion-equation.notion-equation-block{
   align-items: center;
 }
+
+/* CUSTOM */
+.dark-mode .notion-asset-wrapper iframe {
+  background: #191919;
+}
+
+.light-mode .notion-asset-wrapper iframe {
+  background: #FFFFFF;
+}
