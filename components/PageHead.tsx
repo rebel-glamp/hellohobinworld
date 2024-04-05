@@ -46,7 +46,7 @@ export const PageHead: React.FC<
       <meta name="google-site-verification" content="g2iPQwYwA5l4sWs79KX6gGsGnYlj20xMweFyRDC4SMs" />
 
       {/* 애드센스 */}
-      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5720233567452209" crossorigin="anonymous"></script>
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5720233567452209" crossOrigin="anonymous"></script>
 
       {site && (
         <>
