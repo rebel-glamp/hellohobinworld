@@ -69,7 +69,6 @@ function Gallery({ blockIds, collectionView, collection }) {
           {blockIds?.map((blockId) => {
             const block = recordMap.block[blockId]?.value as PageBlock
             if (!block) return null
-            console.log(collectionView.format);
             
             return (
               <CollectionCard

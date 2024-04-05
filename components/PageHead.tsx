@@ -45,6 +45,9 @@ export const PageHead: React.FC<
       <meta name="naver-site-verification" content="29e2505ddcf70e4220775f9a248d69056d19d4ca" />
       <meta name="google-site-verification" content="g2iPQwYwA5l4sWs79KX6gGsGnYlj20xMweFyRDC4SMs" />
 
+      {/* 애드센스 */}
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5720233567452209" crossorigin="anonymous"></script>
+
       {site && (
         <>
           <meta property='og:site_name' content={site.name} />
