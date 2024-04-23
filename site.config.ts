@@ -10,7 +10,7 @@ export default siteConfig({
 
   // basic site info (required)
   name: 'Hello, Hobin World!',
-  domain: 'chocolate-chartreuse-fd1.notion.site',
+  domain: 'blog.glamp.kr',
   author: 'hobin',
 
   // open graph metadata (optional)
