@@ -41,7 +41,7 @@ export async function getStaticPaths() {
         pageId
       }
     })),
-    // paths: [],
+    // paths: [], 
     fallback: true
   }
 
