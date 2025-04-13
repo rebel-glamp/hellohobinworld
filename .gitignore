@@ -1,4 +1,8 @@
 nohup.out
 .next/*
+<<<<<<< HEAD
 node_modules
 123124
+=======
+node_modules
+>>>>>>> 6f9d869236471fed3e5a57a34df48793b4cbfab0
